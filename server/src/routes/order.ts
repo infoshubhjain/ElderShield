@@ -2,10 +2,10 @@ import { Router } from "express";
 import { prisma } from "../db/client";
 import { requireAuth, AuthRequest } from "../middleware/auth";
 import { placeDeliveryOrder } from "../services/deliveryMock";
+import { ensureDefaultPaymentMethod } from "../services/bootstrap";
 
 const router = Router();
 
-// Place a simple essentials order with stored default payment method.
 router.post("/", requireAuth, async (req: AuthRequest, res) => {
   const { category, items } = req.body as {
     category: "GROCERIES" | "MEDICINES" | "MEALS";
@@ -18,20 +18,14 @@ router.post("/", requireAuth, async (req: AuthRequest, res) => {
 
   const userId = req.userId as string;
 
-  // Ensure user has a default payment method configured.
-  const payment = await prisma.paymentMethod.findFirst({
-    where: { userId, isDefault: true }
-  });
-  if (!payment) {
-    return res.status(400).json({ error: "No payment method on file" });
-  }
+  await ensureDefaultPaymentMethod(prisma, userId);
 
   const order = await prisma.order.create({
     data: {
       userId,
       category,
       items: items.join(", "),
-      totalAmount: null // Using null for now – normally calculated from catalog.
+      totalAmount: Number((items.length * 4.75).toFixed(2))
     }
   });
 
@@ -43,7 +37,6 @@ router.post("/", requireAuth, async (req: AuthRequest, res) => {
   });
 });
 
-// List recent orders for the current user.
 router.get("/", requireAuth, async (req: AuthRequest, res) => {
   const orders = await prisma.order.findMany({
     where: { userId: req.userId },
@@ -54,6 +47,3 @@ router.get("/", requireAuth, async (req: AuthRequest, res) => {
 });
 
 export default router;
-
-
-

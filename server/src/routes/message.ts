@@ -5,13 +5,13 @@ import { ioInstance } from "../realtime/socket";
 
 const router = Router();
 
-// List messages for a given match (1:1 chat only).
 router.get("/:matchId", requireAuth, async (req: AuthRequest, res) => {
   const { matchId } = req.params;
+  const userId = req.userId as string;
 
   const match = await prisma.match.findUnique({ where: { id: matchId } });
   if (!match) return res.status(404).json({ error: "Not found" });
-  if (match.initiatorId !== req.userId && match.receiverId !== req.userId) {
+  if (match.initiatorId !== userId && match.receiverId !== userId) {
     return res.status(403).json({ error: "Forbidden" });
   }
 
@@ -19,36 +19,49 @@ router.get("/:matchId", requireAuth, async (req: AuthRequest, res) => {
     where: { matchId },
     orderBy: { createdAt: "asc" }
   });
+
+  await prisma.message.updateMany({
+    where: {
+      matchId,
+      recipientId: userId,
+      read: false
+    },
+    data: { read: true }
+  });
+
   return res.json(messages);
 });
 
-// Send a new message – text or voice url.
 router.post("/:matchId", requireAuth, async (req: AuthRequest, res) => {
   const { matchId } = req.params;
   const { content, voiceUrl } = req.body as { content?: string; voiceUrl?: string };
+  const userId = req.userId as string;
+
+  if (!content?.trim() && !voiceUrl) {
+    return res.status(400).json({ error: "Message content is required" });
+  }
 
   const match = await prisma.match.findUnique({ where: { id: matchId } });
   if (!match) return res.status(404).json({ error: "Not found" });
   if (match.status !== "ACCEPTED") {
     return res.status(400).json({ error: "Match not confirmed" });
   }
-  if (match.initiatorId !== req.userId && match.receiverId !== req.userId) {
+  if (match.initiatorId !== userId && match.receiverId !== userId) {
     return res.status(403).json({ error: "Forbidden" });
   }
 
-  const recipientId = match.initiatorId === req.userId ? match.receiverId : match.initiatorId;
+  const recipientId = match.initiatorId === userId ? match.receiverId : match.initiatorId;
 
   const msg = await prisma.message.create({
     data: {
       matchId,
-      senderId: req.userId as string,
+      senderId: userId,
       recipientId,
-      content,
+      content: content?.trim() || null,
       voiceUrl
     }
   });
 
-  // Emit to recipient via WebSocket if connected.
   if (ioInstance) {
     ioInstance.to(`user:${recipientId}`).emit("message:new", msg);
   }
@@ -57,6 +70,3 @@ router.post("/:matchId", requireAuth, async (req: AuthRequest, res) => {
 });
 
 export default router;
-
-
-

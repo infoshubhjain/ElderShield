@@ -1,28 +1,22 @@
-/**
- * Application entry point
- * Initializes React app with error boundary
- */
-
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
+import { VoiceProvider } from "./voice/VoiceContext";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <App />
+    <VoiceProvider>
+      <App />
+    </VoiceProvider>
   </React.StrictMode>
 );
 
-// Register service worker for PWA
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
       .register("/service-worker.js")
-      .then((registration) => {
-        console.log("Service Worker registered:", registration);
-      })
-      .catch((error) => {
-        console.log("Service Worker registration failed:", error);
+      .catch(() => {
+        // no-op for local development
       });
   });
 }

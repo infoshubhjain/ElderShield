@@ -1,10 +1,7 @@
-/**
- * Microphone button for voice assistant
- * Can be used in TopBar or standalone (home screen)
- */
-
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { VoiceOverlay } from "./VoiceOverlay";
+import { useVoice } from "../voice/VoiceContext";
 import "./VoiceMicButton.css";
 
 interface VoiceMicButtonProps {
@@ -12,22 +9,52 @@ interface VoiceMicButtonProps {
 }
 
 export const VoiceMicButton = ({ standalone = false }: VoiceMicButtonProps) => {
-  const [isListening, setIsListening] = useState(false);
-  const [transcription, setTranscription] = useState("");
+  const navigate = useNavigate();
+  const [showOverlay, setShowOverlay] = useState(false);
+  const { listening, supported, lastTranscript, lastIntent, startListening, stopListening, clear } = useVoice();
+
+  const canConfirm = useMemo(() => Boolean(lastTranscript), [lastTranscript]);
 
   const handleClick = () => {
-    if (isListening) {
-      // Stop listening
-      setIsListening(false);
-      setTranscription("");
+    if (listening) {
+      stopListening();
     } else {
-      // Start listening
-      setIsListening(true);
-      // Mock transcription - in production would use Web Speech API
-      setTimeout(() => {
-        setTranscription("Find a friend for morning walk");
-      }, 1000);
+      setShowOverlay(true);
+      startListening();
     }
+  };
+
+  const executeIntent = () => {
+    switch (lastIntent) {
+      case "find_activity":
+        navigate("/activities");
+        break;
+      case "send_message":
+        navigate("/messages");
+        break;
+      case "order_items":
+        navigate("/order");
+        break;
+      case "check_schedule":
+        navigate("/schedule");
+        break;
+      case "open_profile":
+        navigate("/profile");
+        break;
+      case "ask_help":
+        navigate("/help");
+        break;
+      default:
+        break;
+    }
+    clear();
+    setShowOverlay(false);
+  };
+
+  const closeOverlay = () => {
+    stopListening();
+    clear();
+    setShowOverlay(false);
   };
 
   return (
@@ -35,23 +62,21 @@ export const VoiceMicButton = ({ standalone = false }: VoiceMicButtonProps) => {
       <button
         className={`voice-mic-button ${standalone ? "standalone" : ""}`}
         onClick={handleClick}
-        aria-label={isListening ? "Stop listening" : "Start voice assistant"}
-        aria-pressed={isListening}
-        title={isListening ? "Stop listening" : "Start voice assistant"}
+        aria-label={listening ? "Stop listening" : "Start voice assistant"}
+        aria-pressed={listening}
+        type="button"
       >
-        <span aria-hidden="true">{isListening ? "⏹" : "🎤"}</span>
-        <span className="sr-only">
-          {isListening ? "Stop listening" : "Start voice assistant"}
-        </span>
+        <span aria-hidden="true">{listening ? "⏹" : "🎤"}</span>
+        <span className="sr-only">{listening ? "Stop listening" : "Start voice assistant"}</span>
       </button>
 
-      {isListening && (
+      {showOverlay && (
         <VoiceOverlay
-          transcription={transcription}
-          onClose={() => {
-            setIsListening(false);
-            setTranscription("");
-          }}
+          transcription={lastTranscript}
+          unsupported={!supported}
+          canConfirm={canConfirm}
+          onClose={closeOverlay}
+          onConfirm={executeIntent}
         />
       )}
     </>

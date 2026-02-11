@@ -1,6 +1,8 @@
 import { Router } from "express";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
+import { prisma } from "../db/client";
+import { ensureDefaultPaymentMethod } from "../services/bootstrap";
 
 const router = Router();
 
@@ -18,8 +20,6 @@ const verifyOtpSchema = z.object({
   accessibilityNeeds: z.string().optional()
 });
 
-// In production this should integrate with an SMS provider.
-// Here we simulate OTP delivery and validation.
 const otpStore = new Map<string, string>();
 
 router.post("/request-otp", async (req, res) => {
@@ -27,10 +27,8 @@ router.post("/request-otp", async (req, res) => {
   if (!parsed.success) return res.status(400).json({ error: "Invalid payload" });
 
   const { phoneNumber } = parsed.data;
-  const otp = "123456"; // deterministic for now
-  otpStore.set(phoneNumber, otp);
+  otpStore.set(phoneNumber, "123456");
 
-  // TODO: integrate with SMS provider
   return res.json({ success: true });
 });
 
@@ -40,17 +38,31 @@ router.post("/verify-otp", async (req, res) => {
 
   const { phoneNumber, otp, ...profileData } = parsed.data;
   const expectedOtp = otpStore.get(phoneNumber);
-  // For now we accept the fixed code "123456" once it was "sent"
   if (!expectedOtp || expectedOtp !== otp || otp !== "123456") {
     return res.status(401).json({ error: "Invalid OTP" });
   }
 
-  // Lightweight mock user so the frontend can proceed even without a database.
-  const user = {
-    id: `mock-${phoneNumber}`,
-    name: profileData.name || "Friend",
-    role: "USER" as const
-  };
+  const user = await prisma.user.upsert({
+    where: { phoneNumber },
+    update: {
+      name: profileData.name || undefined,
+      ageRange: profileData.ageRange || undefined,
+      approximateLocation: profileData.approximateLocation || undefined,
+      preferredLanguage: profileData.preferredLanguage || undefined,
+      accessibilityNeeds: profileData.accessibilityNeeds || undefined
+    },
+    create: {
+      phoneNumber,
+      name: profileData.name || "Friend",
+      ageRange: profileData.ageRange || "65+",
+      approximateLocation: profileData.approximateLocation || "Nearby",
+      preferredLanguage: profileData.preferredLanguage || "English",
+      accessibilityNeeds: profileData.accessibilityNeeds || null,
+      preferredCommMode: "text"
+    }
+  });
+
+  await ensureDefaultPaymentMethod(prisma, user.id);
 
   const token = jwt.sign(
     { sub: user.id, role: user.role },
@@ -63,12 +75,10 @@ router.post("/verify-otp", async (req, res) => {
     user: {
       id: user.id,
       name: user.name,
-      role: user.role
+      role: user.role,
+      phoneNumber: user.phoneNumber
     }
   });
 });
 
 export default router;
-
-
-

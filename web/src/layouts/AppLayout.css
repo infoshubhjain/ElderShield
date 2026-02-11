@@ -2,10 +2,11 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  max-width: 600px;
+  max-width: 720px;
   margin: 0 auto;
   padding: var(--spacing-md);
-  background-color: var(--color-background);
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(4px);
 }
 
 .app-header {
@@ -15,6 +16,7 @@
   padding: var(--spacing-md) 0;
   border-bottom: 2px solid var(--color-border);
   margin-bottom: var(--spacing-lg);
+  gap: var(--spacing-sm);
 }
 
 .app-title {

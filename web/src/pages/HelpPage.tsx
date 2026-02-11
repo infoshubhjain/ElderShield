@@ -1,79 +1,43 @@
-/**
- * Help and emergency screen
- * Emergency contact button
- * Call support button
- * Caregiver notify button
- * Simple explanation text
- * Back button returns to Home
- */
-
+import { useState } from "react";
 import { TopBar } from "../components/navigation/TopBar";
+import { appApi } from "../services/appApi";
 import "./HelpPage.css";
 
 export const HelpPage = () => {
-  const handleEmergency = () => {
-    if (
-      confirm(
-        "This will call your emergency contact. Are you sure you need immediate help?"
-      )
-    ) {
-      // In production, would trigger phone call
-      alert("Calling emergency contact...");
-    }
-  };
+  const [status, setStatus] = useState<string | null>(null);
 
-  const handleSupport = () => {
-    // In production, would trigger phone call to support
-    alert("Calling support...");
-  };
-
-  const handleCaregiver = () => {
-    // In production, would notify caregiver
-    alert("Notifying your caregiver...");
+  const runAction = async (kind: "EMERGENCY" | "SUPPORT" | "CAREGIVER", message: string) => {
+    await appApi.helpCheckIn(kind);
+    setStatus(message);
   };
 
   return (
     <div className="help-page">
       <TopBar title="Help and emergency" backTo="/home" />
 
+      {status && <div className="status-message success">{status}</div>}
+
       <div className="help-buttons">
-        <button
-          className="btn-danger help-button-large"
-          onClick={handleEmergency}
-          aria-label="Call emergency contact"
-        >
+        <a className="btn-danger help-button-large" href="tel:911" onClick={() => runAction("EMERGENCY", "Emergency request logged. Calling 911...") }>
           <span className="help-button-icon" aria-hidden="true">🆘</span>
-          <span className="help-button-text">Call emergency contact</span>
-        </button>
+          <span className="help-button-text">Call emergency services (911)</span>
+        </a>
 
-        <button
-          className="btn-primary help-button-large"
-          onClick={handleSupport}
-          aria-label="Call support"
-        >
+        <a className="btn-primary help-button-large" href="tel:+18005551234" onClick={() => runAction("SUPPORT", "Support team notified.") }>
           <span className="help-button-icon" aria-hidden="true">📞</span>
-          <span className="help-button-text">Call support</span>
-        </button>
+          <span className="help-button-text">Call Bud Day support</span>
+        </a>
 
-        <button
-          className="btn-secondary help-button-large"
-          onClick={handleCaregiver}
-          aria-label="Notify caregiver"
-        >
+        <button className="btn-secondary help-button-large" onClick={() => runAction("CAREGIVER", "Caregiver alert sent.")}>
           <span className="help-button-icon" aria-hidden="true">👨‍👩‍👧</span>
           <span className="help-button-text">Notify caregiver</span>
         </button>
       </div>
 
       <div className="help-info">
-        <h2 className="help-info-title">Important</h2>
-        <p className="help-info-text">
-          If you are in immediate danger, please use your phone&apos;s emergency
-          services (911 or your local emergency number).
-        </p>
-        <p className="help-info-text">
-          This app is not a replacement for emergency services.
-        </p>
+        <h2 className="help-info-title">Safety reminder</h2>
+        <p className="help-info-text">If you are in immediate danger, call emergency services right away.</p>
+        <p className="help-info-text">Bud Day support is for non-life-threatening help.</p>
       </div>
     </div>
   );

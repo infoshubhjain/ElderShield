@@ -16,6 +16,7 @@
   align-items: center;
   gap: var(--spacing-md);
   text-align: left;
+  text-decoration: none;
 }
 
 .help-button-icon {

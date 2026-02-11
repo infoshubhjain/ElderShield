@@ -1,63 +1,59 @@
-## Bud Day – Elderly-first Social & Essentials Web App
+## Bud Day - Elderly-first Social & Essentials Web App
 
-Bud Day is a production-ready, accessibility-focused web application designed specifically for elderly users to reduce isolation and simplify daily activities.
+Bud Day is an accessibility-focused web application designed for older adults to reduce isolation and simplify everyday tasks.
 
 ### Tech stack
 
-- **Frontend**: React 18, Vite, TypeScript, React Router, Socket.IO client, PWA manifest.
-- **Backend**: Node.js, TypeScript, Express, Prisma (PostgreSQL), Socket.IO, JWT-based auth.
+- Frontend: React 18, Vite, TypeScript, React Router, Zustand, PWA manifest.
+- Backend: Node.js, TypeScript, Express, Prisma, Socket.IO, JWT auth.
+- Database: SQLite by default (`server/prisma/dev.db`) for local setup.
 
-### Key features
+### Core features
 
-- Phone-number + OTP login, no passwords.
-- Simple profile and interest-based **activity matching** with mutual consent.
-- 1:1 **messaging** with real-time updates (Socket.IO-ready).
-- Simple **scheduling** with preset slots handled by the client and stored in matches.
-- Guided **ordering** of essentials with mock third-party delivery integration.
-- Global **voice assistant hook** with a persistent microphone button and a clear intent model.
-- **Admin dashboard** for user, activity, and report oversight.
+- Phone + OTP sign in (passwordless).
+- Activity matching with consent flow.
+- 1:1 messaging with server-backed persistence.
+- Scheduling for accepted matches using preset slots.
+- Guided essentials ordering with delivery mock integration.
+- Global voice assistant button with speech intent detection.
+- Help & emergency check-ins and one-tap call actions.
+- Profile/settings page for accessibility and communication preferences.
 
-### Running locally
+### Run locally
 
-1. Install dependencies from the project root:
+1. Install dependencies from repo root:
 
 ```bash
 npm install
 ```
 
-2. Configure environment variables (create `server/.env`):
+2. Configure backend environment (`server/.env`):
 
 ```bash
-DATABASE_URL="postgresql://user:password@localhost:5432/budday"
 JWT_SECRET="change-me"
 WEB_ORIGIN="http://localhost:5173"
+DATABASE_URL="file:./dev.db"
 ```
 
-3. Set up the database (from `server` folder):
+3. Set up Prisma database:
 
 ```bash
-npm run prisma:migrate   # add a package script for `prisma migrate dev`
+cd server
+npm run prisma:migrate
+npm run prisma:generate
 ```
 
-4. Start backend and frontend in separate terminals:
+4. Start backend and frontend (separate terminals from repo root):
 
 ```bash
 npm run dev:server
 npm run dev:web
 ```
 
-The web app will be available at `http://localhost:5173`, with the API on `http://localhost:4000`.
+App runs on [http://localhost:5173](http://localhost:5173). API runs on [http://localhost:4000](http://localhost:4000).
 
-### Voice assistant integration
+### Notes
 
-The `web/src/voice/VoiceContext.tsx` file defines a small intent model and a single global microphone button. It is the intended integration point for a cloud speech provider (e.g. Azure, Google, AWS); currently it maintains listening state and is ready for wiring to a speech recognition client.
-
-### Accessibility notes
-
-- Large, high-contrast buttons and text across critical screens.
-- No hidden gestures; clear, recognition-based navigation on the home dashboard.
-- Minimal choices per screen; single-column layouts tuned for tablet-sized devices.
-- ARIA roles on alerts and status messages where appropriate.
-
-
-
+- OTP test code is `123456` in local development.
+- The app uses real API calls first and falls back to mock data when backend is unavailable.
+- ESLint scripts exist but no ESLint config is included yet in this repository.

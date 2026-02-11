@@ -17,7 +17,7 @@
   padding: var(--spacing-md);
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
 }
 
 .schedule-item-header {
@@ -34,26 +34,20 @@
   flex: 1;
 }
 
-.schedule-reminder-badge {
-  font-size: var(--font-size-title);
-  line-height: 1;
-}
-
-.schedule-time-slot {
-  font-size: var(--font-size-large);
-  font-weight: 600;
-  color: var(--color-primary);
-  margin: 0;
-}
-
-.schedule-date {
-  font-size: var(--font-size-large);
-  color: var(--color-text);
-  margin: 0;
-}
-
+.schedule-date,
 .schedule-time {
-  font-size: var(--font-size-large);
-  color: var(--color-text-secondary);
   margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.schedule-slot-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--spacing-sm);
+}
+
+@media (max-width: 640px) {
+  .schedule-slot-actions {
+    grid-template-columns: 1fr;
+  }
 }

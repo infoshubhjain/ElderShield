@@ -17,11 +17,28 @@
   margin: 0;
 }
 
+.home-highlight {
+  padding: var(--spacing-md);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, #0f5ea6, #2f7fbe);
+  color: #fff;
+  box-shadow: var(--shadow-md);
+}
+
+.home-highlight-title {
+  font-size: var(--font-size-large);
+  font-weight: 700;
+  margin: 0 0 var(--spacing-xs) 0;
+}
+
+.home-highlight-text {
+  margin: 0;
+}
+
 .home-buttons {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
-  margin-top: var(--spacing-lg);
 }
 
 .home-button {
@@ -44,11 +61,6 @@
 .home-button:hover {
   background-color: var(--color-primary-dark);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-}
-
-.home-button:active {
-  transform: translateY(0);
 }
 
 .home-button-danger {

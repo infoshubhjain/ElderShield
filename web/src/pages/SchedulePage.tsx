@@ -1,35 +1,45 @@
-/**
- * Scheduling screen
- * Preset time slots: morning, afternoon, evening
- * Simple confirmation flow
- * Reminder indicator
- * No free form calendar
- * Back button returns to Home
- */
-
-import { useEffect, useState } from "react";
-import { mockApi } from "../services/mockApi";
+import { useEffect, useMemo, useState } from "react";
+import { appApi, AppMatch } from "../services/appApi";
 import { TopBar } from "../components/navigation/TopBar";
 import "./SchedulePage.css";
 
-interface ScheduledActivity {
-  id: string;
-  activity: { name: string };
-  scheduledFor: string;
-  reminderSet: boolean;
-}
+const SLOTS = [
+  { label: "Morning", hour: 10 },
+  { label: "Afternoon", hour: 14 },
+  { label: "Evening", hour: 18 }
+] as const;
 
 export const SchedulePage = () => {
-  const [scheduled, setScheduled] = useState<ScheduledActivity[]>([]);
+  const [matches, setMatches] = useState<AppMatch[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [status, setStatus] = useState<string | null>(null);
 
   useEffect(() => {
-    mockApi
-      .getScheduledActivities()
-      .then(setScheduled)
-      .catch(() => setScheduled([]))
+    appApi
+      .listMatches()
+      .then(setMatches)
+      .catch(() => setMatches([]))
       .finally(() => setIsLoading(false));
   }, []);
+
+  const accepted = useMemo(
+    () => matches.filter((m) => m.status === "ACCEPTED" || !m.status),
+    [matches]
+  );
+
+  const handleSchedule = async (matchId: string, slotHour: number) => {
+    const scheduled = new Date();
+    scheduled.setDate(scheduled.getDate() + 1);
+    scheduled.setHours(slotHour, 0, 0, 0);
+
+    await appApi.scheduleMatch(matchId, scheduled.toISOString());
+    setMatches((prev) =>
+      prev.map((match) =>
+        match.id === matchId ? { ...match, scheduledFor: scheduled.toISOString() } : match
+      )
+    );
+    setStatus("Schedule updated.");
+  };
 
   if (isLoading) {
     return (
@@ -44,56 +54,35 @@ export const SchedulePage = () => {
     <div className="schedule-page">
       <TopBar title="My schedule" backTo="/home" />
 
-      {scheduled.length === 0 ? (
+      {status && <div className="status-message success">{status}</div>}
+
+      {accepted.length === 0 ? (
         <div className="empty-state">
           <div className="empty-state-icon">📅</div>
-          <p className="empty-state-text">
-            You have no scheduled activities yet.
-          </p>
-          <p className="empty-state-text">
-            Connect with a friend to schedule an activity together.
-          </p>
+          <p className="empty-state-text">No accepted matches yet to schedule.</p>
         </div>
       ) : (
         <div className="schedule-list">
-          {scheduled.map((item) => {
-            const date = new Date(item.scheduledFor);
-            const timeSlot =
-              date.getHours() < 12
-                ? "Morning"
-                : date.getHours() < 17
-                ? "Afternoon"
-                : "Evening";
-
-            return (
-              <div key={item.id} className="schedule-item">
-                <div className="schedule-item-header">
-                  <h2 className="schedule-activity-name">
-                    {item.activity.name}
-                  </h2>
-                  {item.reminderSet && (
-                    <span className="schedule-reminder-badge" aria-label="Reminder set">
-                      🔔
-                    </span>
-                  )}
-                </div>
-                <p className="schedule-time-slot">{timeSlot}</p>
-                <p className="schedule-date">
-                  {date.toLocaleDateString([], {
-                    weekday: "long",
-                    month: "long",
-                    day: "numeric"
-                  })}
-                </p>
-                <p className="schedule-time">
-                  {date.toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit"
-                  })}
-                </p>
+          {accepted.map((match) => (
+            <div key={match.id} className="schedule-item">
+              <div className="schedule-item-header">
+                <h2 className="schedule-activity-name">{match.activity.name}</h2>
               </div>
-            );
-          })}
+              <p className="schedule-date">With: {match.otherUser?.name || "Companion"}</p>
+              <p className="schedule-time">
+                {match.scheduledFor
+                  ? `Scheduled: ${new Date(match.scheduledFor).toLocaleString()}`
+                  : "Not scheduled yet"}
+              </p>
+              <div className="schedule-slot-actions">
+                {SLOTS.map((slot) => (
+                  <button key={slot.label} className="btn-secondary" onClick={() => handleSchedule(match.id, slot.hour)}>
+                    Set {slot.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

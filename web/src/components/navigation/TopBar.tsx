@@ -1,10 +1,3 @@
-/**
- * Top bar component for all non-home screens
- * Contains: Back button (left), Title (center), Microphone (right)
- * Always visible and persistent
- */
-
-import { ReactNode } from "react";
 import { BackButton } from "./BackButton";
 import { VoiceMicButton } from "../VoiceMicButton";
 import "./TopBar.css";
@@ -18,9 +11,7 @@ interface TopBarProps {
 export const TopBar = ({ title, backTo, showBack = true }: TopBarProps) => {
   return (
     <header className="top-bar" role="banner">
-      <div className="top-bar-left">
-        {showBack && <BackButton to={backTo} />}
-      </div>
+      <div className="top-bar-left">{showBack && <BackButton to={backTo} />}</div>
       <h1 className="top-bar-title">{title}</h1>
       <div className="top-bar-right">
         <VoiceMicButton />

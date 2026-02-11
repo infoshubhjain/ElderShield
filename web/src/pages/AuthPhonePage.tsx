@@ -1,17 +1,11 @@
-/**
- * Phone number input screen
- * First step of authentication
- * Very simple, clear progress indication
- * No back button (first screen)
- */
-
 import { useState, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { mockApi } from "../services/mockApi";
+import { appApi } from "../services/appApi";
 import "./AuthPhonePage.css";
 
 export const AuthPhonePage = () => {
   const [phone, setPhone] = useState("");
+  const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [caregiverMode, setCaregiverMode] = useState(false);
@@ -23,10 +17,10 @@ export const AuthPhonePage = () => {
     setIsLoading(true);
 
     try {
-      await mockApi.requestOtp(phone);
-      navigate("/auth/otp", { state: { phone, caregiverMode } });
+      await appApi.requestOtp(phone);
+      navigate("/auth/otp", { state: { phone, caregiverMode, name } });
     } catch (err) {
-      setError("Could not send code. Please check your number and try again.");
+      setError(err instanceof Error ? err.message : "Could not send code. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -40,9 +34,7 @@ export const AuthPhonePage = () => {
       </div>
 
       <h1 className="auth-title">Welcome to Bud Day</h1>
-      <p className="auth-subtitle">
-        Connect with friends and simplify your daily activities
-      </p>
+      <p className="auth-subtitle">Simple daily support and social connection.</p>
 
       {error && (
         <div className="status-message error" role="alert">
@@ -51,19 +43,28 @@ export const AuthPhonePage = () => {
       )}
 
       <form onSubmit={handleSubmit} className="auth-form">
-        <label className="input-label">
-          Your phone number
-          <input
-            type="tel"
-            className="input-field"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="Enter your phone number"
-            required
-            autoFocus
-            aria-required="true"
-          />
-        </label>
+        <label className="input-label" htmlFor="name">Your name (optional)</label>
+        <input
+          id="name"
+          className="input-field"
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="How should we address you?"
+        />
+
+        <label className="input-label" htmlFor="phone">Your phone number</label>
+        <input
+          id="phone"
+          type="tel"
+          className="input-field"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="Enter your phone number"
+          required
+          autoFocus
+          aria-required="true"
+        />
 
         <label className="checkbox-label">
           <input
@@ -75,12 +76,8 @@ export const AuthPhonePage = () => {
           <span>I am setting this up with help from a caregiver</span>
         </label>
 
-        <button
-          type="submit"
-          className="btn-primary"
-          disabled={isLoading || !phone.trim()}
-        >
-          {isLoading ? "Sending..." : "Continue"}
+        <button type="submit" className="btn-primary" disabled={isLoading || !phone.trim()}>
+          {isLoading ? "Sending code..." : "Continue"}
         </button>
       </form>
     </div>

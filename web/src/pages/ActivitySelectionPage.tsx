@@ -1,41 +1,30 @@
-/**
- * Activity selection screen
- * Predefined activity list as large cards
- * Icon plus text, tap once to select
- * Continue button at bottom
- * Back button returns to Home
- */
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { mockApi } from "../services/mockApi";
+import { appApi, AppActivity } from "../services/appApi";
 import { TopBar } from "../components/navigation/TopBar";
 import "./ActivitySelectionPage.css";
 
-interface Activity {
-  id: string;
-  name: string;
-  icon: string;
-}
-
 export const ActivitySelectionPage = () => {
-  const [activities, setActivities] = useState<Activity[]>([]);
+  const [activities, setActivities] = useState<AppActivity[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-    mockApi
+    appApi
       .getActivities()
       .then(setActivities)
       .catch(() => setActivities([]))
       .finally(() => setIsLoading(false));
   }, []);
 
+  const visible = activities.filter((activity) =>
+    `${activity.name} ${activity.category || ""}`.toLowerCase().includes(search.toLowerCase())
+  );
+
   const handleContinue = () => {
-    if (selectedId) {
-      navigate("/matches", { state: { activityId: selectedId } });
-    }
+    if (selectedId) navigate("/matches", { state: { activityId: selectedId } });
   };
 
   if (isLoading) {
@@ -50,33 +39,35 @@ export const ActivitySelectionPage = () => {
   return (
     <div className="activity-selection-page">
       <TopBar title="Choose an activity" backTo="/home" />
-      <p className="page-subtitle">
-        Select an activity you would like to do with a friend
-      </p>
+      <p className="page-subtitle">Select what you feel like doing today.</p>
+
+      <label className="input-label" htmlFor="activity-search">Search activity</label>
+      <input
+        id="activity-search"
+        className="input-field"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Type: walk, chat, music..."
+      />
 
       <div className="activity-list">
-        {activities.map((activity) => (
+        {visible.map((activity) => (
           <button
             key={activity.id}
             className={`card ${selectedId === activity.id ? "card-selected" : ""}`}
             onClick={() => setSelectedId(activity.id)}
             aria-pressed={selectedId === activity.id}
-            aria-label={`Select ${activity.name}`}
           >
-            <span className="card-icon" aria-hidden="true">
-              {activity.icon}
+            <span className="card-icon" aria-hidden="true">{activity.icon || "👥"}</span>
+            <span className="card-content">
+              {activity.name}
+              {activity.category ? <small className="card-subtitle">{activity.category}</small> : null}
             </span>
-            <span className="card-content">{activity.name}</span>
           </button>
         ))}
       </div>
 
-      <button
-        className="btn-primary"
-        onClick={handleContinue}
-        disabled={!selectedId}
-        style={{ marginTop: "var(--spacing-lg)" }}
-      >
+      <button className="btn-primary" onClick={handleContinue} disabled={!selectedId}>
         Continue
       </button>
     </div>

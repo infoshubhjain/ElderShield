@@ -1,33 +1,17 @@
-/**
- * Match results screen
- * List of matched users
- * Minimal information: first name, distance, availability
- * Connect button for each match
- * Empty state handling
- * Back button returns to Activity selection
- */
-
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { mockApi } from "../services/mockApi";
+import { appApi, AppMatch } from "../services/appApi";
 import { TopBar } from "../components/navigation/TopBar";
 import "./MatchResultsPage.css";
-
-interface Match {
-  id: string;
-  activity: { id: string; name: string };
-  user: { id: string; firstName: string; distance: string };
-  availability: string;
-}
 
 export const MatchResultsPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const activityId = (location.state as { activityId?: string })?.activityId;
 
-  const [matches, setMatches] = useState<Match[]>([]);
+  const [matches, setMatches] = useState<AppMatch[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [connectingId, setConnectingId] = useState<string | null>(null);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (!activityId) {
@@ -35,12 +19,26 @@ export const MatchResultsPage = () => {
       return;
     }
 
-    mockApi
+    appApi
       .findMatches(activityId)
-      .then(setMatches)
-      .catch(() => setMatches([]))
+      .then((result) => {
+        if (Array.isArray(result)) {
+          setMatches(result);
+          setStatusMessage(null);
+        } else {
+          setMatches([]);
+          setStatusMessage(result.message || "Searching for people nearby...");
+        }
+      })
+      .catch(() => setStatusMessage("Could not search right now. Please try again."))
       .finally(() => setIsLoading(false));
   }, [activityId, navigate]);
+
+  const handleDecision = async (matchId: string, decision: "ACCEPTED" | "REJECTED") => {
+    await appApi.respondMatch(matchId, decision);
+    if (decision === "ACCEPTED") navigate("/messages");
+    else setMatches((prev) => prev.filter((m) => m.id !== matchId));
+  };
 
   if (isLoading) {
     return (
@@ -54,47 +52,14 @@ export const MatchResultsPage = () => {
     );
   }
 
-  const handleConnect = async (matchId: string) => {
-    setConnectingId(matchId);
-    try {
-      await mockApi.connectToMatch(matchId);
-      navigate("/messages");
-    } catch (err) {
-      // Error handling - show message
-      alert("Could not connect. Please try again.");
-    } finally {
-      setConnectingId(null);
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="page-loading">
-        <div className="loading" aria-label="Finding matches"></div>
-        <p>Finding friends nearby...</p>
-      </div>
-    );
-  }
-
-  if (matches.length === 0) {
+  if (!matches.length) {
     return (
       <div className="match-results-page">
-        <TopBar title="No matches" backTo="/activities" />
+        <TopBar title="Match status" backTo="/activities" />
         <div className="empty-state">
           <div className="empty-state-icon">👥</div>
-          <p className="empty-state-text">
-            We could not find anyone nearby for this activity right now.
-          </p>
-          <p className="empty-state-text">
-            Please try again later or choose a different activity.
-          </p>
-          <button
-            className="btn-primary"
-            onClick={() => navigate("/activities")}
-            style={{ marginTop: "var(--spacing-lg)" }}
-          >
-            Choose different activity
-          </button>
+          <p className="empty-state-text">{statusMessage || "No matches yet."}</p>
+          <button className="btn-primary" onClick={() => navigate("/activities")}>Try another activity</button>
         </div>
       </div>
     );
@@ -102,26 +67,21 @@ export const MatchResultsPage = () => {
 
   return (
     <div className="match-results-page">
-      <TopBar title="Friends found" backTo="/activities" />
-      <p className="page-subtitle">
-        Here are people nearby who want to do this activity
-      </p>
+      <TopBar title="Potential companions" backTo="/activities" />
+      <p className="page-subtitle">Confirm to start chatting safely.</p>
 
       <div className="match-list">
         {matches.map((match) => (
           <div key={match.id} className="match-card">
             <div className="match-info">
-              <h2 className="match-name">{match.user.firstName}</h2>
-              <p className="match-details">{match.user.distance}</p>
-              <p className="match-details">{match.availability}</p>
+              <h2 className="match-name">{match.otherUser?.name || "Companion"}</h2>
+              <p className="match-details">Activity: {match.activity.name}</p>
+              <p className="match-details">Status: {match.status || "PENDING"}</p>
             </div>
-            <button
-              className="btn-primary"
-              onClick={() => handleConnect(match.id)}
-              disabled={connectingId === match.id}
-            >
-              {connectingId === match.id ? "Connecting..." : "Connect"}
-            </button>
+            <div className="match-actions">
+              <button className="btn-primary" onClick={() => handleDecision(match.id, "ACCEPTED")}>Connect</button>
+              <button className="btn-secondary" onClick={() => handleDecision(match.id, "REJECTED")}>Skip</button>
+            </div>
           </div>
         ))}
       </div>

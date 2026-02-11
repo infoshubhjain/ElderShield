@@ -38,3 +38,9 @@
   color: var(--color-text-secondary);
   margin: 0;
 }
+
+.match-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm);
+}

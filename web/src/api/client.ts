@@ -6,6 +6,10 @@ export function setAuthToken(token: string | null) {
   authToken = token;
 }
 
+export function getApiBase() {
+  return API_BASE;
+}
+
 async function request(path: string, options: RequestInit = {}) {
   const headers: HeadersInit = {
     "Content-Type": "application/json",
@@ -19,9 +23,22 @@ async function request(path: string, options: RequestInit = {}) {
     ...options,
     headers
   });
+
   if (!res.ok) {
-    throw new Error(`Request failed: ${res.status}`);
+    let message = `Request failed: ${res.status}`;
+    try {
+      const body = await res.json();
+      if (body?.error && typeof body.error === "string") {
+        message = body.error;
+      }
+    } catch {
+      // ignore parse errors
+    }
+    throw new Error(message);
   }
+
+  const contentType = res.headers.get("content-type") || "";
+  if (!contentType.includes("application/json")) return null;
   return res.json();
 }
 
@@ -31,10 +48,20 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ phoneNumber })
     }),
-  verifyOtp: (phoneNumber: string, otp: string) =>
+  verifyOtp: (
+    phoneNumber: string,
+    otp: string,
+    profile?: {
+      name?: string;
+      ageRange?: string;
+      approximateLocation?: string;
+      preferredLanguage?: string;
+      accessibilityNeeds?: string;
+    }
+  ) =>
     request("/auth/verify-otp", {
       method: "POST",
-      body: JSON.stringify({ phoneNumber, otp })
+      body: JSON.stringify({ phoneNumber, otp, ...profile })
     }),
   me: () => request("/users/me"),
   activities: () => request("/activities"),
@@ -44,6 +71,16 @@ export const api = {
       body: JSON.stringify({ activityId })
     }),
   listMatches: () => request("/matches"),
+  respondMatch: (id: string, decision: "ACCEPTED" | "REJECTED") =>
+    request(`/matches/${id}/respond`, {
+      method: "POST",
+      body: JSON.stringify({ decision })
+    }),
+  scheduleMatch: (id: string, scheduledFor: string) =>
+    request(`/matches/${id}/schedule`, {
+      method: "POST",
+      body: JSON.stringify({ scheduledFor })
+    }),
   listMessages: (matchId: string) => request(`/messages/${matchId}`),
   sendMessage: (matchId: string, content: string) =>
     request(`/messages/${matchId}`, {
@@ -55,8 +92,10 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ category, items })
     }),
-  listOrders: () => request("/orders")
+  listOrders: () => request("/orders"),
+  helpCheckIn: (kind: "EMERGENCY" | "SUPPORT" | "CAREGIVER", note?: string) =>
+    request("/help/check-in", {
+      method: "POST",
+      body: JSON.stringify({ kind, note })
+    })
 };
-
-
-
