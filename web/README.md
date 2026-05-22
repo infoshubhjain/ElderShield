@@ -1,6 +1,6 @@
-# Bud Day - Frontend Application
+# ElderShield - Frontend Application
 
-Production-grade web application for elderly users focused on reducing isolation and simplifying daily activities.
+Production-grade web application for elderly users providing comprehensive elderly care, social connections, and emergency support.
 
 ## Overview
 

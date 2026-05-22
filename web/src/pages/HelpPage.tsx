@@ -25,7 +25,7 @@ export const HelpPage = () => {
 
         <a className="btn-primary help-button-large" href="tel:+18005551234" onClick={() => runAction("SUPPORT", "Support team notified.") }>
           <span className="help-button-icon" aria-hidden="true">📞</span>
-          <span className="help-button-text">Call Bud Day support</span>
+          <span className="help-button-text">Call ElderShield support</span>
         </a>
 
         <button className="btn-secondary help-button-large" onClick={() => runAction("CAREGIVER", "Caregiver alert sent.")}>
@@ -37,7 +37,7 @@ export const HelpPage = () => {
       <div className="help-info">
         <h2 className="help-info-title">Safety reminder</h2>
         <p className="help-info-text">If you are in immediate danger, call emergency services right away.</p>
-        <p className="help-info-text">Bud Day support is for non-life-threatening help.</p>
+        <p className="help-info-text">ElderShield support is for non-life-threatening help.</p>
       </div>
     </div>
   );

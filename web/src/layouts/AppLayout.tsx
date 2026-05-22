@@ -31,7 +31,7 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
     >
       {isHomeScreen ? (
         <header className="app-header" role="banner">
-          <h1 className="app-title">Bud Day</h1>
+          <h1 className="app-title">ElderShield</h1>
           <AccessibilityControls />
         </header>
       ) : null}

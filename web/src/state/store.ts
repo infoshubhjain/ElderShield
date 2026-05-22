@@ -72,7 +72,7 @@ export const useAppStore = create<AppState>()(
         }))
     }),
     {
-      name: "bud-day-storage",
+      name: "eldershield-storage",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         user: state.user,

@@ -37,9 +37,9 @@ export const Onboarding = () => {
     <div className="screen" aria-label="Welcome">
       {step === "phone" && (
         <form onSubmit={handlePhoneSubmit} className="form">
-          <h1 className="screen-title">Welcome to Bud Day</h1>
+          <h1 className="screen-title">Welcome to ElderShield</h1>
           <p className="helper-text" style={{ marginTop: "-1rem" }}>
-            Connect with friends and simplify your daily activities
+            Comprehensive elderly care and social connection
           </p>
           {error && <div className="error-text" role="alert">{error}</div>}
           <label className="field-label">

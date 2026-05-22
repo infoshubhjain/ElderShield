@@ -33,8 +33,8 @@ export const AuthPhonePage = () => {
         <span className="auth-progress-step">2</span>
       </div>
 
-      <h1 className="auth-title">Welcome to Bud Day</h1>
-      <p className="auth-subtitle">Simple daily support and social connection.</p>
+      <h1 className="auth-title">Welcome to ElderShield</h1>
+      <p className="auth-subtitle">Comprehensive elderly care and social connection.</p>
 
       {error && (
         <div className="status-message error" role="alert">

@@ -4,7 +4,7 @@
  * Simple caching strategy for elderly-focused app
  */
 
-const CACHE_NAME = "bud-day-v1";
+const CACHE_NAME = "eldershield-v1";
 const STATIC_ASSETS = [
   "/",
   "/index.html",

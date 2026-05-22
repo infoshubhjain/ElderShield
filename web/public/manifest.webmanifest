@@ -1,11 +1,11 @@
 {
-  "name": "Bud Day - Connect with Friends",
-  "short_name": "Bud Day",
-  "description": "Connect with friends and simplify daily activities",
+  "name": "ElderShield - Comprehensive Elderly Care",
+  "short_name": "ElderShield",
+  "description": "Comprehensive elderly care and social connection platform",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#0066cc",
+  "theme_color": "#0284c7",
   "orientation": "portrait",
   "icons": [
     {

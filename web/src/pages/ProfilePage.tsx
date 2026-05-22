@@ -16,7 +16,7 @@ export const ProfilePage = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   const initials = useMemo(() => {
-    if (!user?.name) return "BD";
+    if (!user?.name) return "ES";
     return user.name
       .split(" ")
       .map((part) => part[0]?.toUpperCase())
@@ -45,7 +45,7 @@ export const ProfilePage = () => {
           {initials}
         </div>
         <div>
-          <h2 className="profile-name">{user?.name || "Bud Day User"}</h2>
+          <h2 className="profile-name">{user?.name || "ElderShield User"}</h2>
           <p className="profile-phone">{user?.phoneNumber || "No phone number"}</p>
         </div>
       </section>
