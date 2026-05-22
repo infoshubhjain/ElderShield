@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -30,7 +30,7 @@ model User {
   paymentMethods     PaymentMethod[]
   reportsFiled       Report[]      @relation("ReportsFiled")
   reportsAgainst     Report[]      @relation("ReportsAgainst")
-  role               Role          @default(USER)
+  role               String          @default("USER")
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
 }
@@ -69,7 +69,7 @@ model Match {
   receiverId    String
   activity      Activity @relation(fields: [activityId], references: [id])
   activityId    String
-  status        MatchStatus @default(PENDING)
+  status        String @default("PENDING")
   approximateDistanceKm Float?
   scheduledFor  DateTime?
   createdAt     DateTime @default(now())
@@ -94,9 +94,9 @@ model Order {
   id          String     @id @default(cuid())
   user        User       @relation(fields: [userId], references: [id])
   userId      String
-  category    OrderCategory
+  category    String
   items       String     // serialized list of items
-  status      OrderStatus @default(PENDING)
+  status      String @default("PENDING")
   totalAmount Float?
   createdAt   DateTime   @default(now())
 }
@@ -118,39 +118,7 @@ model Report {
   reportedUser  User     @relation("ReportsAgainst", fields: [reportedUserId], references: [id])
   reportedUserId String
   reason        String
-  status        ReportStatus @default(OPEN)
+  status        String @default("OPEN")
   createdAt     DateTime @default(now())
 }
-
-enum Role {
-  USER
-  ADMIN
-}
-
-enum MatchStatus {
-  PENDING
-  ACCEPTED
-  REJECTED
-}
-
-enum OrderCategory {
-  GROCERIES
-  MEDICINES
-  MEALS
-}
-
-enum OrderStatus {
-  PENDING
-  CONFIRMED
-  DISPATCHED
-  COMPLETED
-  CANCELLED
-}
-
-enum ReportStatus {
-  OPEN
-  IN_REVIEW
-  RESOLVED
-}
-
 
