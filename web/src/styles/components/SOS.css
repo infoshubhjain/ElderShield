@@ -1,0 +1,140 @@
+.sos-button {
+  position: fixed;
+  bottom: var(--spacing-lg);
+  right: var(--spacing-lg);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  font-weight: 700;
+  font-size: var(--font-size-large);
+  box-shadow: 0 8px 16px rgba(220, 38, 38, 0.4);
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s ease;
+  z-index: 100;
+  min-height: unset;
+  padding: 0;
+}
+
+.sos-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 12px 24px rgba(220, 38, 38, 0.5);
+}
+
+.sos-button:active {
+  transform: scale(0.95);
+}
+
+.sos-confirmation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.sos-modal {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  text-align: center;
+  max-width: 90%;
+  width: 100%;
+  position: relative;
+}
+
+.sos-close {
+  position: absolute;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sos-modal-icon {
+  color: var(--color-danger);
+  margin-bottom: var(--spacing-md);
+}
+
+.sos-modal h2 {
+  font-size: var(--font-size-title);
+  color: var(--color-danger);
+  margin-bottom: var(--spacing-md);
+  font-weight: 700;
+}
+
+.sos-modal p {
+  font-size: var(--font-size-large);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-md);
+}
+
+.sos-warning {
+  font-size: var(--font-size-base);
+  color: var(--color-danger);
+  font-weight: 500;
+  margin-bottom: var(--spacing-lg);
+}
+
+.sos-confirm-btn {
+  margin-top: var(--spacing-lg);
+}
+
+.sos-activated {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  text-align: center;
+  z-index: 9999;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.sos-icon {
+  color: var(--color-danger);
+  margin-bottom: var(--spacing-md);
+  animation: pulse-sos 1s ease-in-out infinite;
+}
+
+@keyframes pulse-sos {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+.sos-activated p {
+  font-size: var(--font-size-large);
+  color: var(--color-text);
+  margin-bottom: var(--spacing-md);
+  font-weight: 600;
+}
+
+.sos-small {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+}

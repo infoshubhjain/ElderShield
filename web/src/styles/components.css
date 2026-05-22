@@ -19,20 +19,25 @@
   gap: var(--spacing-sm);
   text-align: center;
   width: 100%;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 6px rgba(2, 132, 199, 0.2);
+  transition: all 0.2s ease;
 }
 
 .btn-primary:hover {
   background-color: var(--color-primary-dark);
+  box-shadow: 0 6px 12px rgba(2, 132, 199, 0.3);
+  transform: translateY(-2px);
 }
 
 .btn-primary:active {
   transform: scale(0.98);
+  box-shadow: 0 2px 4px rgba(2, 132, 199, 0.2);
 }
 
 .btn-primary:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
 }
 
 /* Button - secondary */
@@ -51,11 +56,14 @@
   gap: var(--spacing-sm);
   text-align: center;
   width: 100%;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 6px rgba(139, 92, 246, 0.2);
+  transition: all 0.2s ease;
 }
 
 .btn-secondary:hover {
-  background-color: #008833;
+  background-color: var(--color-secondary-dark);
+  box-shadow: 0 6px 12px rgba(139, 92, 246, 0.3);
+  transform: translateY(-2px);
 }
 
 /* Button - danger */
@@ -74,17 +82,20 @@
   gap: var(--spacing-sm);
   text-align: center;
   width: 100%;
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 4px 6px rgba(220, 38, 38, 0.2);
+  transition: all 0.2s ease;
 }
 
 .btn-danger:hover {
   background-color: var(--color-danger-dark);
+  box-shadow: 0 6px 12px rgba(220, 38, 38, 0.3);
+  transform: translateY(-2px);
 }
 
 /* Card - for activity and match items */
 .card {
   background-color: var(--color-surface);
-  border: 2px solid var(--color-border);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: var(--spacing-md);
   min-height: var(--touch-target-min);
@@ -94,11 +105,15 @@
   gap: var(--spacing-md);
   width: 100%;
   text-align: left;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
 }
 
 .card:hover {
   border-color: var(--color-primary);
   background-color: var(--color-background);
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15);
+  transform: translateY(-2px);
 }
 
 .card:active {
@@ -193,12 +208,12 @@
 
 .status-message.error {
   border-left-color: var(--color-danger);
-  background-color: rgba(204, 0, 0, 0.1);
+  background-color: rgba(220, 38, 38, 0.08);
 }
 
 .status-message.success {
-  border-left-color: var(--color-secondary);
-  background-color: rgba(0, 170, 68, 0.1);
+  border-left-color: var(--color-success);
+  background-color: rgba(34, 197, 94, 0.08);
 }
 
 /* Empty state */

@@ -1,6 +1,7 @@
 {
-  "name": "bud-day-server",
-  "version": "1.0.0",
+  "name": "eldershield-server",
+  "version": "2.0.0",
+  "description": "ElderShield backend - comprehensive elderly care platform",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

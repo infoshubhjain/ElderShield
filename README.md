@@ -1,6 +1,16 @@
-## Bud Day - Elderly-first Social & Essentials Web App
+## ElderShield - Comprehensive Elderly Care & Activity Platform
 
-Bud Day is an accessibility-focused web application designed for older adults to reduce isolation and simplify everyday tasks.
+ElderShield is a modern, accessibility-first platform designed to empower seniors with meaningful social connections, emergency support, and simplified essential services. Built with elderly users at the center, ElderShield combines voice-first interfaces, large accessible typography, and intelligent activity matching.
+
+### Key Capabilities
+
+- **Voice-Enabled Interface**: Global voice assistant with natural language intent detection
+- **Activity Matching**: AI-powered matching with built-in safety and consent flows  
+- **Real-Time Messaging**: Secure 1:1 communication with server persistence
+- **Emergency Support**: One-tap SOS, health check-ins, and caregiver notifications
+- **Smart Ordering**: Simplified essentials procurement with delivery tracking
+- **Accessibility First**: Large typography, high contrast, keyboard navigation, ARIA compliance
+- **Caregiver Dashboard**: Family oversight without compromising senior independence
 
 ### Tech stack
 
